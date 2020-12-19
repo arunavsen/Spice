@@ -114,5 +114,17 @@ namespace Spice.Areas.Admin.Controllers
                 return NotFound();
             }
         }
+
+        // GET - DETAILS
+        public async Task<IActionResult> Details(int id)
+        {
+            var category = await _db.Categories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return View(category);
+        }
     }
 }
