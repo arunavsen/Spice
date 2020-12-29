@@ -1,0 +1,38 @@
+﻿@model SubCategory
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<br />
+
+<form method="post" asp-action="Create">
+    <div class="border backgroundWhite">
+        <h2>Do you want to delete this Sub Category?</h2>
+        <br />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="Name" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Name" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="Category" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Category.Name" class="form-control" readonly />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-5 offset-2">
+                <partial name="_DeleteAndBackToListPartial" model="@Model.Id" />
+            </div>
+        </div>
+    </div>
+</form>
