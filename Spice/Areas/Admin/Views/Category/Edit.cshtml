@@ -23,7 +23,7 @@
         </div>
         <div class="form-group row">
             <div class="col-5 offset-2">
-                <partial name="_EditAndBackToListPartial" model="@Model.Id"/>
+                <partial name="_EditAndBackToListPartial" model="@Model.Id" />
             </div>
         </div>
     </div>
@@ -31,3 +31,7 @@
 
 
 
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
