@@ -18,14 +18,13 @@ namespace Spice.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _hostEnvironment;
-        [BindProperty]
-        public MenuItemViewModel MenuItemVM { get; set; }
+        [BindProperty] public MenuItemViewModel MenuItemVM { get; set; }
 
         public MenuItemController(ApplicationDbContext db, IWebHostEnvironment hostEnvironment)
         {
             _db = db;
             _hostEnvironment = hostEnvironment;
-            MenuItemVM=new MenuItemViewModel()
+            MenuItemVM = new MenuItemViewModel()
             {
                 Categories = _db.Categories,
                 MenuItem = new MenuItem()
@@ -36,8 +35,8 @@ namespace Spice.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var menuItems = await _db.MenuItems
-                .Include(m=>m.Category)
-                .Include(m=>m.SubCategory)
+                .Include(m => m.Category)
+                .Include(m => m.SubCategory)
                 .ToListAsync();
 
             return View(menuItems);
@@ -49,7 +48,7 @@ namespace Spice.Areas.Admin.Controllers
             return View(MenuItemVM);
         }
 
-        [HttpPost,ActionName("Create")]
+        [HttpPost, ActionName("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePOST()
         {
@@ -69,13 +68,14 @@ namespace Spice.Areas.Admin.Controllers
 
             var menuITemFromDb = await _db.MenuItems.FindAsync(MenuItemVM.MenuItem.Id);
 
-            if (files.Count>0)
+            if (files.Count > 0)
             {
                 // File has been uploaded
-                var uploads = Path.Combine(webRootPath,"images");
+                var uploads = Path.Combine(webRootPath, "images");
                 var extension = Path.GetExtension(files[0].FileName);
 
-                using (var filesStream = new FileStream(Path.Combine(uploads,MenuItemVM.MenuItem.Id+extension),FileMode.Create))
+                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension),
+                    FileMode.Create))
                 {
                     files[0].CopyTo(filesStream);
                 }
@@ -86,7 +86,7 @@ namespace Spice.Areas.Admin.Controllers
             {
                 // No file was uploaded. So use default.
                 var uploads = Path.Combine(webRootPath, @"images\" + SD.DefaultFoodImage);
-                System.IO.File.Copy(uploads,webRootPath+@"\images\"+MenuItemVM.MenuItem.Id+".png");
+                System.IO.File.Copy(uploads, webRootPath + @"\images\" + MenuItemVM.MenuItem.Id + ".png");
                 menuITemFromDb.Image = @"\images\" + menuITemFromDb.Id + ".png";
             }
 
@@ -103,8 +103,8 @@ namespace Spice.Areas.Admin.Controllers
             }
 
             MenuItemVM.MenuItem = await _db.MenuItems.Include(m => m.Category)
-                                                    .Include(m => m.SubCategory)
-                                                    .SingleOrDefaultAsync(m => m.Id == id);
+                .Include(m => m.SubCategory)
+                .SingleOrDefaultAsync(m => m.Id == id);
             MenuItemVM.SubCategories =
                 await _db.SubCategories.Where(m => m.CategoryId == MenuItemVM.MenuItem.CategoryId).ToListAsync();
 
@@ -112,6 +112,7 @@ namespace Spice.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             return View(MenuItemVM);
         }
 
@@ -123,6 +124,7 @@ namespace Spice.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             MenuItemVM.MenuItem.SubCategoryId = Convert.ToInt32(Request.Form["SubCategoryId"].ToString());
 
             if (!ModelState.IsValid)
@@ -153,7 +155,8 @@ namespace Spice.Areas.Admin.Controllers
                 }
 
                 // We will upload the new file
-                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_new), FileMode.Create))
+                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_new),
+                    FileMode.Create))
                 {
                     files[0].CopyTo(filesStream);
                 }
@@ -191,7 +194,52 @@ namespace Spice.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             return View(MenuItemVM);
+        }
+
+        // GET - DELETE
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            MenuItemVM.MenuItem = await _db.MenuItems.Include(m => m.Category)
+                .Include(m => m.SubCategory)
+                .SingleOrDefaultAsync(m => m.Id == id);
+            MenuItemVM.SubCategories =
+                await _db.SubCategories.Where(m => m.CategoryId == MenuItemVM.MenuItem.CategoryId).ToListAsync();
+
+            if (MenuItemVM.MenuItem == null)
+            {
+                return NotFound();
+            }
+
+            return View(MenuItemVM);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePOST(int id)
+        {
+            var menuITemFromDb = await _db.MenuItems.FindAsync(MenuItemVM.MenuItem.Id);
+            string webRootPath = _hostEnvironment.WebRootPath;
+
+            if (menuITemFromDb != null)
+            {
+                var imagePath = Path.Combine(webRootPath, menuITemFromDb.Image.Trim('\\'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                _db.MenuItems.Remove(menuITemFromDb);
+                await _db.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
