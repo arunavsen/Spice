@@ -127,11 +127,11 @@ namespace Spice.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
+                MenuItemVM.SubCategories =
+                    await _db.SubCategories.Where(m => m.CategoryId == MenuItemVM.MenuItem.CategoryId).ToListAsync();
                 return View(MenuItemVM);
             }
 
-            _db.MenuItems.Add(MenuItemVM.MenuItem);
-            await _db.SaveChangesAsync();
 
             // Work on the image saving section
             string webRootPath = _hostEnvironment.WebRootPath;
@@ -141,24 +141,33 @@ namespace Spice.Areas.Admin.Controllers
 
             if (files.Count > 0)
             {
-                // File has been uploaded
+                // New image has been uploaded
                 var uploads = Path.Combine(webRootPath, "images");
-                var extension = Path.GetExtension(files[0].FileName);
+                var extension_new = Path.GetExtension(files[0].FileName);
 
-                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension), FileMode.Create))
+                // Delete the old original file
+                var imagePath = Path.Combine(webRootPath, menuITemFromDb.Image.Trim('\\'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                // We will upload the new file
+                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_new), FileMode.Create))
                 {
                     files[0].CopyTo(filesStream);
                 }
 
-                menuITemFromDb.Image = @"\images\" + MenuItemVM.MenuItem.Id + extension;
+                menuITemFromDb.Image = @"\images\" + MenuItemVM.MenuItem.Id + extension_new;
             }
-            else
-            {
-                // No file was uploaded. So use default.
-                var uploads = Path.Combine(webRootPath, @"images\" + SD.DefaultFoodImage);
-                System.IO.File.Copy(uploads, webRootPath + @"\images\" + MenuItemVM.MenuItem.Id + ".png");
-                menuITemFromDb.Image = @"\images\" + menuITemFromDb.Id + ".png";
-            }
+
+            menuITemFromDb.Name = MenuItemVM.MenuItem.Name;
+            menuITemFromDb.Description = MenuItemVM.MenuItem.Description;
+            menuITemFromDb.CategoryId = MenuItemVM.MenuItem.CategoryId;
+            menuITemFromDb.SubCategoryId = MenuItemVM.MenuItem.SubCategoryId;
+            menuITemFromDb.Spicyness = MenuItemVM.MenuItem.Spicyness;
+            menuITemFromDb.Price = MenuItemVM.MenuItem.Price;
+
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
