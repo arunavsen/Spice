@@ -6,7 +6,7 @@
 
 <br />
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
+<form asp-action="Delete" method="post" enctype="multipart/form-data">
     <div class="border backgroundWhite">
         <h2>Create Coupon</h2>
         <br />
@@ -21,7 +21,7 @@
                 <img src="@imgsrc" height="100px" width="100%" />
             </div>
         </div>
-        
+        <fieldset disabled>
             <div class="form-group row">
                 <div class="col-2">
                     <label asp-for="Name" class="col-form-label"></label>
@@ -73,12 +73,14 @@
                     <input type="checkbox" class="form-control" asp-for="IsActive" />
                 </div>
             </div>
-            <div class="form-group row">
-                <div class="col-5 offset-2">
-                    <partial name="_EditAndBackToListPartial" model="Model.ID" />
-                </div>
+        </fieldset>
+
+        <div class="form-group row">
+            <div class="col-5 offset-2">
+                <partial name="_DeleteAndBackToListPartial" model="@Model.ID" />
             </div>
         </div>
+    </div>
 </form>
 
 @section Scripts
