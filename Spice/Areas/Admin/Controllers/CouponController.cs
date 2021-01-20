@@ -118,5 +118,21 @@ namespace Spice.Areas.Admin.Controllers
                 return View(coupon);
             }
         }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var couponFromDb = await _db.Coupons.SingleOrDefaultAsync(s => s.ID == id);
+            if (couponFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(couponFromDb);
+        }
     }
 }
