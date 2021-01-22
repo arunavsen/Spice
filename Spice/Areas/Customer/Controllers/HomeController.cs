@@ -4,24 +4,36 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Spice.Data;
 using Spice.Models;
+using Spice.Models.ViewModel;
 
 namespace Spice.Controllers
 {
     [Area("Customer")]
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _db;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
         {
             _logger = logger;
+            _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            IndexViewModel indexVM = new IndexViewModel()
+            {
+                MenuItems = await _db.MenuItems.Include(c=>c.Category).Include(c=>c.SubCategory).ToListAsync(),
+                Coupons = await _db.Coupons.Where(c=>c.IsActive==true).ToListAsync(),
+                Categories = await _db.Categories.ToListAsync()
+            };
+            
+            return View(indexVM);
         }
 
         public IActionResult Privacy()
