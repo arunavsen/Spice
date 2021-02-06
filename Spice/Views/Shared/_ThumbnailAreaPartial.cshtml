@@ -40,11 +40,10 @@
                         <div class="row col-12 text-justify d-none d-md-block">
                             <span>@Html.Raw(@item.Description)</span>
                         </div>
+                        <div class="col-md-3 col-sm-12 offset-md-9 text-center">
+                            <a asp-action="Details" class="btn btn-success form-control" asp-route-id="@item.Id">Details</a>
+                        </div>
                     </div>
-                    <div class="col-md-3 col-sm-12 offset-md-9 text-center">
-                        <a asp-action="Details" class="btn btn-success form-control" asp-route-id="@item.Id">Details</a>
-                    </div>
-                    
                 </div>
             </div>
         }
