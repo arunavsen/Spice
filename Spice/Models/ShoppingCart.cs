@@ -11,6 +11,10 @@ namespace Spice.Models
 
     public class ShoppingCart
     {
+        public ShoppingCart()
+        {
+            Count = 1;
+        }
         public int Id { get; set; }
         public string ApplicationUserID { get; set; }
 
