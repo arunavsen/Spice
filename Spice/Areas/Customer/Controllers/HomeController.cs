@@ -36,6 +36,15 @@ namespace Spice.Controllers
                 Categories = await _db.Categories.ToListAsync()
             };
             
+            // We want to keep the session in the index page for the login user
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim!=null)
+            {
+                var cnt = _db.ShoppingCarts.Where(u => u.ApplicationUserID == claim.Value).ToList().Count;
+                HttpContext.Session.SetInt32("ssCartCount", cnt);
+            }
+
             return View(indexVM);
         }
 

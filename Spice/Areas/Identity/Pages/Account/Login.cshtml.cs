@@ -6,11 +6,14 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Spice.Data;
 
 namespace Spice.Areas.Identity.Pages.Account
 {
@@ -20,14 +23,17 @@ namespace Spice.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly ApplicationDbContext _db;
 
         public LoginModel(SignInManager<IdentityUser> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _db = db;
         }
 
         [BindProperty]
@@ -82,6 +88,13 @@ namespace Spice.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    //We have all the shopping cart item of the logged in user
+                    var user = await _db.Users.Where(m => m.Email == Input.Email).FirstOrDefaultAsync();
+                    var lstShoppingCart = await _db.ShoppingCarts.Where(m => m.ApplicationUserID == user.Id).ToListAsync();
+
+                    //We have assigned the session in our login page
+                    HttpContext.Session.SetInt32("ssCartCount", lstShoppingCart.Count);
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
