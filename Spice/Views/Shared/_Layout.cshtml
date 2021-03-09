@@ -42,11 +42,11 @@
                         }
 
 
-                        @if (HttpContextAccessor.HttpContext.Session.GetInt32("ssCartCount") != null)
+                        @if (HttpContextAccessor.HttpContext.Session.GetInt32(@SD.ssSoppingCartCount) != null)
                         {
                             <li style="color: white">
                                 @{
-                                    var count = HttpContextAccessor.HttpContext.Session.GetInt32("ssCartCount");
+                                    var count = HttpContextAccessor.HttpContext.Session.GetInt32(@SD.ssSoppingCartCount);
                                 }
                                 <a href="#" class="nav-link">
                                     <i class="fas fa-shopping-cart"></i>(@count)

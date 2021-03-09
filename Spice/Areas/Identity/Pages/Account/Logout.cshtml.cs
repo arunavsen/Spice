@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Spice.Utility;
 
 namespace Spice.Areas.Identity.Pages.Account
 {
@@ -32,7 +33,7 @@ namespace Spice.Areas.Identity.Pages.Account
             await _signInManager.SignOutAsync();
 
             //When the user logout, session will be zero.
-            HttpContext.Session.SetInt32("ssCartCount",0);
+            HttpContext.Session.SetInt32(SD.ssSoppingCartCount,0);
 
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)

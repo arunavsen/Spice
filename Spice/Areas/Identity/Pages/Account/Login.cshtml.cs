@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Spice.Data;
+using Spice.Utility;
 
 namespace Spice.Areas.Identity.Pages.Account
 {
@@ -93,7 +94,7 @@ namespace Spice.Areas.Identity.Pages.Account
                     var lstShoppingCart = await _db.ShoppingCarts.Where(m => m.ApplicationUserID == user.Id).ToListAsync();
 
                     //We have assigned the session in our login page
-                    HttpContext.Session.SetInt32("ssCartCount", lstShoppingCart.Count);
+                    HttpContext.Session.SetInt32(SD.ssSoppingCartCount, lstShoppingCart.Count);
 
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
