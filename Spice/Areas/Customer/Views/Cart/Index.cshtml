@@ -1,0 +1,80 @@
+﻿@model Spice.Models.ViewModel.OrderDetailsCart
+@{
+    ViewData["Title"] = "Index";
+}
+
+<form method="post">
+    @if (Model.ShoppingCarts.Count > 0)
+    {
+        <input id="userId" asp-for="@Model.ShoppingCarts[0].ApplicationUserID" hidden />
+        <div class="backgroundWhite">
+            <div class="container">
+                <div class="card" style="background: transparent;">
+                    <div class="card-header ml-0 row container">
+                        <div class="col-md-6">
+                            <i class="fa fa-shopping-cart"></i> Shopping Cart
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a asp-area="Customer" asp-controller="Home" asp-action="Index" class="btn btn-outline-info">Continue Shopping</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in Model.ShoppingCarts)
+                        {
+                            <div class="row">
+                                <div class="d-none d-lg-block col-lg-2 text-center py-1">
+                                    <img src="@item.MenuItem.Image" width="120px" height="100px" class="rounded" />
+                                </div>
+                                <div class="col-12 col-lg-5 text-sm-center text-lg-left">
+                                    <h5 class="font-weight-bold card-title">@item.MenuItem.Name</h5>
+                                    <p class="card-text text-muted">
+                                        
+                                            @item.MenuItem.Description
+                                    </p>
+                                </div>
+                                <div class="col-12 text-sm-center col-lg-5 text-lg-right row">
+                                    <div class="col-4 text-md-right" style="padding-top: 5px;">
+                                        <h6>
+                                            <strong>
+                                                $@item.MenuItem.Price<span class="text-muted">
+                                                    *
+                                                </span>
+                                                @item.Count
+                                            </strong>
+                                        </h6>
+                                    </div>
+
+                                    <div class="col-6 col-sm-4 col-lg-6">
+                                        <div class="float-right mx-1">
+                                            <button type="submit" class="btn btn-primary btn-sm" asp-action="plus" asp-route-cartId="@item.Id">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <div class="float-right mx-1">
+                                            <button type="submit" class="btn btn-danger btn-sm" asp-action="minus" asp-route-cartId="@item.Id">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-2 col-sm-4 col-lg-2 text-right">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" asp-action="remove" asp-route-cartId="@item.Id">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="backgroundWhite">
+            <h5 class="font-weight-bolder">No item is added in your cart.</h5>
+        </div>
+    }
+</form>
